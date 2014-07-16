@@ -57,7 +57,7 @@ class SimpleCommand
 end
 ```
 
-To use this, simply call SimpleCommand.new.execute - the command will perform #some_complex_calculation and then be marked as :complete
+To use this, simply call SimpleCommand.new.execute - the command will perform #some_complex_calculation and then be marked as :complete - we can then find out what happend by calling the #result method.
 
 By itself, this is pretty boring.  However, as we've got a simple state machine in there, we can do more interesting stuff; especially when a command is persistent.
 
@@ -75,7 +75,7 @@ class DrivesACar
     if has_reached_destination?
       mark_as :complete
     elsif traffic_light.colour == :green
-      mark_as :driving
+      mark_as :moving
     else 
       mark_as :stopped
     end
