@@ -1,7 +1,11 @@
 # Czar
 
 Czar is a framework for building applications around the Command
-pattern.  
+pattern.  However, it is intended that these commands will stop at
+various points during their lifetime, then resume again a bit later.
+Maybe in response to incoming web-requests, because there's a
+background timer in action, or simply because we are waiting on an
+external resource.
 
 Everything your application does is a Command of some kind; those
 commands may be simple actions, sequences of actions, sequences with
