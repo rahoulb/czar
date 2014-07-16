@@ -58,7 +58,7 @@ To use this, simply call SimpleCommand.new.execute - the command will perform #s
 By itself, this is pretty boring.  However, as we've got a simple state machine in there, we can do more interesting stuff; especially when a command is persistent.
 
 For example:
-
+```
 class DrivesACar
   include Czar::Command
 
@@ -85,6 +85,7 @@ class DrivesACar
     # code goes here
   end
 end
+```
 
 In this case, we instantiate a DrivesACar command and store it somewhere.  Every now and then (in response to a timer, a cron job or some other trigger) we call execute, which looks at the command's internal state and chooses if it is moving or stopped.  Eventually, when we have reached our destination, the command is marked as complete. Also note, that as we do nothing when stopped, there's no need to define a stopped method.  
 
@@ -92,6 +93,7 @@ Commands can also trigger child commands, and are notified when the child comple
 
 For example: 
 
+```
 class CourierDeliversAParcel < Struct.new(:pickup_location, :dropoff_location)
   include Czar::Command
 
@@ -109,6 +111,7 @@ class CourierDeliversAParcel < Struct.new(:pickup_location, :dropoff_location)
     end
   end
 end
+```
 
 ## Contributing
 
