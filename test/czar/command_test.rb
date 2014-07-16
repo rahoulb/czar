@@ -101,6 +101,41 @@ describe Czar::Command do
     end
   end
 
+  describe "updating internal state" do
+    subject { internal_state_task.new }
+
+    it "ensures any internal state is maintained" do
+      subject.execute
+      subject.this.must_equal true
+      subject.execute
+      subject.that.must_equal true
+      subject.this.must_equal true
+    end
+
+    let(:internal_state_task) do 
+      Class.new do
+        include Czar::Command
+
+        def start
+          mark_as :doing_stuff, this: true
+        end
+
+        def doing_stuff
+          mark_as :done_stuff, that: true
+        end
+
+        def this
+          internal[:this]
+        end
+
+        def that 
+          internal[:that]
+        end
+      end
+
+    end
+  end
+
   describe "triggering child commands" do
     subject { parent_task.new }
 

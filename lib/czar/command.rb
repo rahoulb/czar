@@ -33,7 +33,7 @@ module Czar
 
     def mark_as state, params = {}
       @state = state.to_sym
-      @internal_state = params.dup
+      @internal_state = internal.merge(params)
       notify_parent if @state == :complete
     end
 
