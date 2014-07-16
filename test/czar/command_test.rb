@@ -126,10 +126,6 @@ describe Czar::Command do
           mark_as :waiting_for_child_to_complete
         end
 
-        def waiting_for_child_to_complete
-          sleep 0.1
-        end
-
         def child_task_completed child_task
           mark_as :complete
         end
