@@ -80,6 +80,27 @@ describe Czar::Command do
     end
   end
 
+  describe "having states that do nothing" do
+    subject { do_nothing_task.new }
+
+    it "executes the first task and then does nothing" do
+      subject.execute
+      subject.state.must_equal :idle
+      subject.execute
+      subject.state.must_equal :idle
+    end
+
+    let(:do_nothing_task) do
+      Class.new do
+        include Czar::Command
+
+        def start
+          mark_as :idle
+        end
+      end
+    end
+  end
+
   describe "triggering child commands" do
     subject { parent_task.new }
 

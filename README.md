@@ -34,6 +34,81 @@ Or install it yourself as:
 
 ## Usage
 
+The Command module represents an implementation of the Command pattern
+where each Command has an internal state machine and can optionally spawn child commands.
+At its simplest, a Command will be executed, moving it from "start" state to "complete" state. 
+For example:
+```
+class SimpleCommand
+  include Czar::Command
+
+  def start
+   result = some_complex_calculation
+   mark_as :complete, result: result
+  end
+
+  def some_complex_calculation
+   return :whatever
+  end
+end
+```
+
+To use this, simply call SimpleCommand.new.execute - the command will perform #some_complex_calculation and then be marked as :complete
+
+By itself, this is pretty boring.  However, as we've got a simple state machine in there, we can do more interesting stuff; especially when a command is persistent.
+
+For example:
+
+class DrivesACar
+  include Czar::Command
+
+  def start
+    mark_as :moving
+  end
+
+  def moving
+    move_forward
+    if has_reached_destination?
+      mark_as :complete
+    elsif traffic_light.colour == :green
+      mark_as :driving
+    else 
+      mark_as :stopped
+    end
+  end
+
+  def move_forward
+    :vroom
+  end
+
+  def has_reached_destination?
+    # code goes here
+  end
+end
+
+In this case, we instantiate a DrivesACar command and store it somewhere.  Every now and then (in response to a timer, a cron job or some other trigger) we call execute, which looks at the command's internal state and chooses if it is moving or stopped.  Eventually, when we have reached our destination, the command is marked as complete. Also note, that as we do nothing when stopped, there's no need to define a stopped method.  
+
+Commands can also trigger child commands, and are notified when the child completes.
+
+For example: 
+
+class CourierDeliversAParcel < Struct.new(:pickup_location, :dropoff_location)
+  include Czar::Command
+
+  def start
+    perform CollectsParcel.new(pickup_location)
+    mark_as :waiting_for_pickup
+  end
+
+  def child_task_completed task
+    if self.state == :waiting_for_pickup
+      perform DeliversParcel.new(dropoff_location)
+      mark_as :waiting_for_dropoff
+    elsif self.state == :waiting_for_dropoff
+      mark_as :complete
+    end
+  end
+end
 
 ## Contributing
 

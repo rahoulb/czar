@@ -2,7 +2,7 @@ module Czar
   module Command
 
     def execute
-      self.send self.state
+      self.send self.state if self.respond_to? self.state
     end
 
     def result
