@@ -9,18 +9,36 @@ external resource.
 
 Everything your application does is a Command of some kind; those
 commands may be simple actions, sequences of actions, sequences with
-decisions within them or series that trigger other commands.  
-
-The advantage of using commands within, for example, a Rails application
-is that you can then make your database model classes *passive* - that
-is they become purely data - and the interesting stuff is all handled by
-commands.  No more fat models with callbacks all over the place.  
-
-Plus using commands makes it easy to ensure that authorisation is done
-correctly (as each command is well-defined) and makes it trivial to add
-in logging and so on.  
+decisions within them or series that trigger other commands.  Czar is
+intended to make those commands explicit - when your user reads some
+data, makes a change to something or updates an item, each one of those
+is a command flowing through your system.  Representing them as their
+own individual objects simplifies authorisation and can mean your code
+is much simpler.  For example, in a Rails app, you would often rely on
+callbacks to trigger various actions on a given model.  But if you use a
+UpdatesGivenModel command, you can write some linear code to handle all
+updates, logging, after_update handlers, instead of piecing together a
+trail of callbacks.  And as you can build complex commands by
+aggregating multiple child commands, it also makes testing your app
+simpler, as well as making its processes more explicit.  
 
 Czar can allow commands to be persisted (with a in-memory and a Redis adapter for now).
+
+The original requirement for Czar was in an application that did an
+import of products from a CSV.  As this could be a very long-running
+task, each operation was put onto a background queue and the system was
+scaled by adding new worker processes.  Each product, as it was being imported,
+may have required several images to be imported from an FTP server; so
+there were many tasks that could all happen in parallel: reading the
+CSV, updating or adding individual products, searching for and importing
+images from the FTP server, attaching imported images to products.  
+
+So the ImportsCsv command would spawn several hundred ImportsProduct commands, 
+and dependent upon the data, each of those could spawn several 
+ImportsImageFromFtpServer and AttachesImageToProducts tasks.  But all the 
+user cares about is "when will the import be done?".  So the parent ImportsCsv command keeps track
+of its child tasks and, being persistent, can report its progress back
+to the web application.  
 
 ## Installation
 
@@ -40,6 +58,7 @@ Or install it yourself as:
 
 The Command module represents an implementation of the Command pattern
 where each Command has an internal state machine and can optionally spawn child commands.
+
 At its simplest, a Command will be executed, moving it from "start" state to "complete" state. 
 For example:
 ```
