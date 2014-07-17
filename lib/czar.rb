@@ -1,5 +1,6 @@
 require "czar/version"
+require "czar/command"
 
 module Czar
-  # Your code goes here...
 end
+

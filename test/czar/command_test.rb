@@ -1,4 +1,4 @@
-require_relative '../../lib/czar/command'
+require 'czar'
 require 'minitest/autorun'
 require 'mocha/setup'
 
