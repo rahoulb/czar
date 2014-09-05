@@ -27,6 +27,7 @@ module Czar
     attr_accessor :parent
 
     def perform child_task
+      return if child_task.nil?
       child_task.parent = self
       children << child_task
       child_task.execute
